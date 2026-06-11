@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TETRYFT</title>
+    <meta name="description" content="Matrix Tetris — Tetris classico com tema Matrix e recordes salvos no navegador." />
+    <meta property="og:title" content="MATRIX TETRIS" />
+    <meta property="og:description" content="Tetris classico com tema Matrix e recordes salvos no navegador." />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="matrix-rain"></canvas>
+    <div class="scanlines"></div>
+
+    <div class="container">
+      <div class="panel">
+        <h1>TETRYFT</h1>
+
+        <div class="stat-box">
+          <div class="label">PONTOS</div>
+          <div class="value" id="score">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">NIVEL</div>
+          <div class="value" id="level">1</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">LINHAS</div>
+          <div class="value" id="lines">0</div>
+        </div>
+
+        <div class="controls">
+          <div class="title">CONTROLES</div>
+          <span class="key">&larr; &rarr;</span> mover<br />
+          <span class="key">&uarr;</span> girar<br />
+          <span class="key">&darr;</span> descer<br />
+          <span class="key">ESPACO</span> queda rapida<br />
+          <span class="key">C</span> guardar peca<br />
+          <span class="key">P</span> pausar
+        </div>
+
+        <button id="start">INICIAR</button>
+        <button id="pause">PAUSAR</button>
+        <button id="hold"></button>
+      </div>
+      <div class="board-wrap">
+        <canvas id="game" width="300" height="600"></canvas>
+
+        <div class="overlay" id="overlay-idle">
+          <div class="blink" style="font-size: 24px; letter-spacing: 3px">PRONTO?</div>
+        </div>
+
+        <div class="overlay" id="overlay-pause">
+          <h2>PAUSADO</h2>
+          <div class="final">pressione P para continuar</div>
+        </div>
+
+        <div class="overlay" id="overlay-over">
+          <h2>FIM DE JOGO</h2>
+          <div class="final" id="final-stats"></div>
+          <input id="name-input" maxlength="20" placeholder="SEU NOME" />
+          <button id="save-score">SALVAR RECORDE</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="next-box">
+          <div class="label">GUARDADA</div>
+          <canvas id="hold-canvas" width="120" height="100"></canvas>
+        </div>
+
+        <div class="next-box">
+          <div class="label">PROXIMA</div>
+          <canvas id="next" width="120" height="100"></canvas>
+        </div>
+
+        <div class="scores-box">
+          <div class="label">RECORDES</div>
+          <div id="scores-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
