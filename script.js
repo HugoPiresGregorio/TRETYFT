@@ -1,4 +1,3 @@
-/* MATRIX TETRIS - script.js (standalone, no backend, localStorage high scores) */
 (function () {
   "use strict";
 
@@ -186,7 +185,6 @@
     linesEl.textContent = lines;
   }
 
-  // Drawing
   function drawCell(context, x, y, color, size, alpha) {
     context.save();
     context.globalAlpha = alpha == null ? 1 : alpha;
