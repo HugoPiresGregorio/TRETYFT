@@ -1,3 +1,4 @@
+
 (function () {
   "use strict";
 
@@ -85,6 +86,40 @@
   var state = "idle"; 
   var lastSavedId = null;
 
+  // Sistema de Som Sintetizado
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  var oscillator = audioCtx.createOscillator();
+  var gainNode = audioCtx.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  if (type === 'hit') {
+    
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.1);
+  } else if (type === 'tetris') {
+   
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+    oscillator.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.3);
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.5);
+  }
+}
+
   function emptyBoard() {
     var b = [];
     for (var y = 0; y < ROWS; y++) {
@@ -138,6 +173,8 @@
   }
 
   function merge(piece, board) {
+    playSound('hit'); 
+  for (var y = 0; y < piece.shape.length; y++) {
     for (var y = 0; y < piece.shape.length; y++) {
       for (var x = 0; x < piece.shape[y].length; x++) {
         if (piece.shape[y][x]) {
@@ -148,8 +185,28 @@
       }
     }
   }
-
+  }
   function clearLines() {
+    var cleared = 0;
+
+
+  if (cleared > 0) {
+    var points = [0, 100, 300, 500, 800][cleared] || cleared * 200;
+    score += points * level;
+    lines += cleared;
+
+
+    if (cleared >= 4) {
+      playSound('tetris');
+      var boardWrap = document.querySelector('.board-wrap');
+      boardWrap.classList.add('shake');
+      
+
+      setTimeout(function() {
+        boardWrap.classList.remove('shake');
+      }, 400); 
+    }
+    }
     var cleared = 0;
     for (var y = ROWS - 1; y >= 0; y--) {
       var full = true;
@@ -446,7 +503,7 @@
     overOverlay.classList.remove("show");
   }
 
-  // High scores (localStorage)
+
   function loadScores() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -596,3 +653,35 @@
   drawHold();
   draw();
 })();
+
+
+const SUPABASE_URL = 'https://epbabzahexdmcnuqnogw.supabase.co/rest/v1/';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwYmFiemFoZXhkbWNudXFub2d3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMTgxOTMsImV4cCI6MjA5Njc5NDE5M30.afq9bP_xpNn0qu1RwZt1lRXudHRS0yj-nYGh3u0jBiA';
+async function loadScoresGlobal() {
+  try {
+
+    const response = await fetch('https://epbabzahexdmcnuqnogw.supabase.co/rest/v1/');
+    const data = await response.json();
+    return data; 
+  } catch (error) {
+    console.error("Erro ao carregar ranking", error);
+    return []; 
+  }
+}
+
+async function saveScoreGlobal(entry) {
+  try {
+    await fetch('https://epbabzahexdmcnuqnogw.supabase.co/rest/v1/scores', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(entry)
+    });
+    
+    const updatedList = await loadScoresGlobal();
+    renderScores(updatedList);
+  } catch (error) {
+    console.error("Erro ao salvar pontuação", error);
+  }
+}
